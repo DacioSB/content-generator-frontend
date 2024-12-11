@@ -46,7 +46,7 @@ export function Navbar() {
             </NavigationMenu.Item>
           </NavigationMenu.List>
         </NavigationMenu.Root>
-        <Button href="/sign-in">
+        <Button href="/sign-in" variant="secondary" size="small">
           Sign In
         </Button>
       </div>

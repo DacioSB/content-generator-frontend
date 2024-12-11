@@ -1,5 +1,6 @@
 import React from 'react';
 import { Cloud, Plug, BotIcon as Robot } from 'lucide-react';
+import { Button } from './Button';
 
 interface FeatureCardProps {
   icon: React.ReactNode;
@@ -35,9 +36,10 @@ export function Hero() {
         <p className="mb-8 max-w-2xl text-lg text-gray-600">
           Experience the power of AI in content generation and moderation. Our platform offers seamless integration, advanced AI tools, and secure cloud storage to help you create and manage content effortlessly.
         </p>
-        <button className="rounded-full bg-teal-500 px-8 py-3 text-base font-medium text-white transition-colors hover:bg-teal-600 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-teal-500">
+        <Button variant="primary" size="large">
           Get Started
-        </button>
+        </Button>
+
       </div>
 
       <div className="mt-20 grid grid-cols-1 gap-12 sm:grid-cols-2 lg:grid-cols-3">
