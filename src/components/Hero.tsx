@@ -19,16 +19,15 @@ function FeatureCard({ icon, title, description }: FeatureCardProps) {
   )
 }
 
-export function Hero(){
+export function Hero() {
   return (
     <div className="mx-auto max-w-6xl px-4 py-16 sm:px-6 lg:px-8">
       <div className="flex flex-col items-center text-center">
-        <div className="mb-8 w-full max-w-2xl">
-          <img
-            src="/assets/hero.png?height=400&width=800"
-            alt="ContentGen Platform illustration"
-            className="h-auto w-full object-contain"
-          />
+        <div 
+          className="mb-8 w-full max-w-2xl h-[400px] bg-cover bg-center"
+          style={{ backgroundImage: "url('/images/hero.png')" }}
+        >
+          {/* Optionally add any overlay or additional content here */}
         </div>
         <h1 className="mb-4 text-4xl font-bold text-gray-900 sm:text-5xl">
           Welcome to ContentGen Platform
