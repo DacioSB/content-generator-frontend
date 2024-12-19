@@ -1,6 +1,6 @@
 import React from 'react';
 import { Cloud, Plug, BotIcon as Robot } from 'lucide-react';
-import { Button } from './Button';
+import { Button } from './ui/Button';
 
 interface FeatureCardProps {
   icon: React.ReactNode;

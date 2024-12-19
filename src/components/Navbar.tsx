@@ -1,6 +1,6 @@
 import { Brain } from 'lucide-react';
 import * as NavigationMenu from "@radix-ui/react-navigation-menu";
-import { Button } from '../Button';
+import { Button } from './ui/Button';
 
 export function Navbar() {
   return (
