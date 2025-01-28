@@ -1,14 +1,26 @@
-import { ProtectedRoute } from './components/ProtectedRoute'
 import { About } from './components/About'
 import { Features } from './components/Features'
 import { Footer } from './components/Footer'
 import { Hero } from './components/Hero'
 import { Navbar } from './components/Navbar'
 import { Pricing } from './components/Pricing'
+import axios from 'axios';
+import { useAuth } from '@clerk/clerk-react'
 
 function App() {
+  const { getToken } = useAuth();
+
+  const fetchData = async () => {
+    const token = await getToken();
+    // const response = await axios.get('https://your-backend-url/api/data', {
+    //   headers: {
+    //     Authorization: `Bearer ${token}`,
+    //   },
+    // });
+    console.log(token);
+  };
   return (
-    <ProtectedRoute>
+    <>
       <Navbar />
       <Hero />
       <div id="features">
@@ -23,7 +35,8 @@ function App() {
       <div id="contact">
         <Footer />
       </div>
-    </ProtectedRoute>
+      <button onClick={fetchData}>Fetch Data</button>
+    </>
   )
 }
 

@@ -6,6 +6,7 @@ import './index.css'
 import App from './App.tsx'
 import { SignIn } from './pages/SignIn'
 import { SignUp } from './pages/SignUp'
+import { ProtectedRoute } from './components/ProtectedRoute.tsx'
 
 const PUBLISHABLE_KEY = import.meta.env.VITE_CLERK_PUBLISHABLE_KEY
 
@@ -26,6 +27,10 @@ const router = createBrowserRouter([
     path: "/sign-up/*",
     element: <SignUp />,
   },
+  {
+    path: "/dashboard/*",
+    element: <ProtectedRoute><div>Protected Dashboard</div></ProtectedRoute>,
+  }
 ])
 
 createRoot(document.getElementById('root')!).render(
