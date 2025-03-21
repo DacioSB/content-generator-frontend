@@ -6,6 +6,7 @@ import { Navbar } from './components/Navbar'
 import { Pricing } from './components/Pricing'
 import axios from 'axios';
 import { useAuth } from '@clerk/clerk-react'
+import Dashboard from './pages/dashboard/page'
 
 function App() {
   const { getToken } = useAuth();
@@ -19,9 +20,11 @@ function App() {
     // });
     console.log(token);
   };
+  
   return (
     <>
-      <Navbar />
+      <Dashboard />
+      {/* <Navbar />
       <Hero />
       <div id="features">
         <Features />
@@ -34,8 +37,9 @@ function App() {
       </div>
       <div id="contact">
         <Footer />
-      </div>
-      <button onClick={fetchData}>Fetch Data</button>
+      </div> */}
+
+      {/* <button onClick={fetchData}>Fetch Data</button> */}
     </>
   )
 }
