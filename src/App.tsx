@@ -23,8 +23,7 @@ function App() {
   
   return (
     <>
-      <Dashboard />
-      {/* <Navbar />
+      <Navbar />
       <Hero />
       <div id="features">
         <Features />
@@ -37,9 +36,7 @@ function App() {
       </div>
       <div id="contact">
         <Footer />
-      </div> */}
-
-      {/* <button onClick={fetchData}>Fetch Data</button> */}
+      </div>
     </>
   )
 }

@@ -1,11 +1,17 @@
 import { Brain } from 'lucide-react';
 import * as NavigationMenu from "@radix-ui/react-navigation-menu";
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { Button } from './ui/Button';
 import { useAuth } from '@clerk/clerk-react';
 
 export function Navbar() {
   const { isSignedIn, signOut } = useAuth();
+  const navigate = useNavigate();
+
+  const handleSignOut = async () => {
+    await signOut();
+    navigate('/');
+  };
   return (
     <header className="sticky top-0 z-50 w-full border-b bg-white">
       <div className="container flex h-16 items-center justify-between px-4 sm:px-8">
@@ -66,13 +72,20 @@ export function Navbar() {
           </NavigationMenu.List>
         </NavigationMenu.Root>
         {isSignedIn ? (
-          <Button
-            variant="secondary"
-            size="small"
-            onClick={() => signOut()}
-          >
-            Sign Out
-          </Button>
+          <div className="flex gap-4">
+            <Link to="/dashboard">
+              <Button variant="secondary" size="small">
+                Dashboard
+              </Button>
+            </Link>
+            <Button
+              variant="secondary"
+              size="small"
+              onClick={handleSignOut}
+            >
+              Sign Out
+            </Button>
+          </div>
         ) : (
           <Link to="/sign-in">
             <Button variant="secondary" size="small">

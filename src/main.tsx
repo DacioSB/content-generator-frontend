@@ -7,6 +7,7 @@ import App from './App.tsx'
 import { SignIn } from './pages/SignIn'
 import { SignUp } from './pages/SignUp'
 import { ProtectedRoute } from './components/ProtectedRoute.tsx'
+import Dashboard from './pages/dashboard/page.tsx'
 
 const PUBLISHABLE_KEY = import.meta.env.VITE_CLERK_PUBLISHABLE_KEY
 
@@ -29,7 +30,7 @@ const router = createBrowserRouter([
   },
   {
     path: "/dashboard/*",
-    element: <ProtectedRoute><div>Protected Dashboard</div></ProtectedRoute>,
+    element: <ProtectedRoute><Dashboard /></ProtectedRoute>,
   }
 ])
 
