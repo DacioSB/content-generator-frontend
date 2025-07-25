@@ -1,44 +1,44 @@
-import { About } from './components/About'
-import { Features } from './components/Features'
-import { Footer } from './components/Footer'
-import { Hero } from './components/Hero'
-import { Navbar } from './components/Navbar'
-import { Pricing } from './components/Pricing'
-import axios from 'axios';
-import { useAuth } from '@clerk/clerk-react'
-import Dashboard from './pages/dashboard/page'
+// File: src/App.tsx (CORRECTED with the right hook)
 
-function App() {
-  const { getToken } = useAuth();
+import { Outlet, useNavigate } from 'react-router-dom';
+import { useAuth } from '@clerk/clerk-react'; // <-- IMPORT useAuth
+import { useEffect } from 'react';
 
-  const fetchData = async () => {
-    const token = await getToken();
-    // const response = await axios.get('https://your-backend-url/api/data', {
-    //   headers: {
-    //     Authorization: `Bearer ${token}`,
-    //   },
-    // });
-    console.log(token);
-  };
-  
+export default function App() {
+  // Use the useAuth() hook to get authentication state.
+  const { isLoaded, isSignedIn } = useAuth(); 
+  const navigate = useNavigate();
+
+  // This effect will handle redirecting signed-in users away from the landing page.
+  useEffect(() => {
+    // Wait until Clerk has loaded its state before making any decisions
+    if (!isLoaded) {
+      return;
+    }
+
+    // If the user is signed in and on the landing page, redirect them to the dashboard.
+    if (isSignedIn && window.location.pathname === '/') {
+      navigate('/dashboard', { replace: true });
+    }
+  }, [isLoaded, isSignedIn, navigate]);
+
+  // While Clerk is loading, you might want to show a loading indicator
+  // to prevent a flash of the landing page for an authenticated user.
+  if (!isLoaded) {
+    return (
+        <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh' }}>
+            Loading...
+        </div>
+    );
+  }
+
+  // The Outlet component from react-router-dom will render the 
+  // active child route defined in main.tsx.
   return (
-    <>
-      <Navbar />
-      <Hero />
-      <div id="features">
-        <Features />
-      </div>
-      <div id="pricing">
-        <Pricing />
-      </div>
-      <div id="about">
-        <About />
-      </div>
-      <div id="contact">
-        <Footer />
-      </div>
-    </>
-  )
+    <div className="app-container">
+      <main>
+        <Outlet />
+      </main>
+    </div>
+  );
 }
-
-export default App
