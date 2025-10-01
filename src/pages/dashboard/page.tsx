@@ -2,8 +2,7 @@
 
 import { useState } from "react"
 import { FileText, ImageIcon, Settings, Folder, LayoutDashboard, LogOut, PlusCircle, Clock } from "lucide-react"
-import { Link, useNavigate } from 'react-router-dom';
-import * as NavigationMenu from "@radix-ui/react-navigation-menu";
+import { useNavigate } from 'react-router-dom';
 
 // Content type for the content generation
 type ContentType = "text" | "image" | null
@@ -20,12 +19,7 @@ interface RecentContent {
 export default function Dashboard() {
   const [selectedContentType, setSelectedContentType] = useState<ContentType>(null);
   const [prompt, setPrompt] = useState("");
-
-  //projects must navigate to Projects page
   const navigate = useNavigate();
-  const handleProjectsClick = () => {
-    navigate('/projects');
-  }
 
   // Mock data for recent projects
   const recentContent: RecentContent[] = [
@@ -70,48 +64,42 @@ export default function Dashboard() {
             <span className="text-lg font-semibold">ContentGen</span>
           </div>
         </div>
+        
         <div className="flex flex-1 flex-col overflow-y-auto pt-5 pb-4">
-          <NavigationMenu.Root>
-            <NavigationMenu.List className="mt-5 flex-1 space-y-1 px-2">
-              <NavigationMenu.Item>
-                <NavigationMenu.Link
-                  className="flex items-center rounded-md px-2 py-2 text-sm font-medium text-teal-600 bg-teal-50 cursor-pointer"
-                >
-                  <LayoutDashboard className="mr-3 h-5 w-5" />
-                  Dashboard
-                </NavigationMenu.Link>
-              </NavigationMenu.Item>
-
-              <NavigationMenu.Item>
-                <NavigationMenu.Link
-                  className="flex items-center rounded-md px-2 py-2 text-sm font-medium text-gray-600 hover:bg-gray-100 cursor-pointer"
-                >
-                  <FileText className="mr-3 h-5 w-5" />
-                  My Content
-                </NavigationMenu.Link>
-              </NavigationMenu.Item>
-
-              <NavigationMenu.Item>
-                <NavigationMenu.Link
-                  className="flex items-center rounded-md px-2 py-2 text-sm font-medium text-gray-600 hover:bg-gray-100 cursor-pointer"
-                  onClick={handleProjectsClick}
-                >
-                  <Folder className="mr-3 h-5 w-5" />
-                  Projects
-                </NavigationMenu.Link>
-              </NavigationMenu.Item>
-
-              <NavigationMenu.Item>
-                <NavigationMenu.Link
-                  className="flex items-center rounded-md px-2 py-2 text-sm font-medium text-gray-600 hover:bg-gray-100 cursor-pointer"
-                >
-                  <Settings className="mr-3 h-5 w-5" />
-                  Settings
-                </NavigationMenu.Link>
-              </NavigationMenu.Item>
-            </NavigationMenu.List>
-          </NavigationMenu.Root>
+          <nav className="mt-5 flex-1 space-y-1 px-2">
+            <button
+              className="w-full flex items-center rounded-md px-2 py-2 text-sm font-medium text-teal-600 bg-teal-50"
+            >
+              <LayoutDashboard className="mr-3 h-5 w-5" />
+              Dashboard
+            </button>
+            
+            <button
+              onClick={() => navigate('/my-content')}
+              className="w-full flex items-center rounded-md px-2 py-2 text-sm font-medium text-gray-600 hover:bg-gray-100"
+            >
+              <FileText className="mr-3 h-5 w-5" />
+              My Content
+            </button>
+            
+            <button
+              onClick={() => navigate('/projects')}
+              className="w-full flex items-center rounded-md px-2 py-2 text-sm font-medium text-gray-600 hover:bg-gray-100"
+            >
+              <Folder className="mr-3 h-5 w-5" />
+              Projects
+            </button>
+            
+            <button
+              onClick={() => navigate('/settings')}
+              className="w-full flex items-center rounded-md px-2 py-2 text-sm font-medium text-gray-600 hover:bg-gray-100"
+            >
+              <Settings className="mr-3 h-5 w-5" />
+              Settings
+            </button>
+          </nav>
         </div>
+        
         <div className="border-t border-gray-200 p-4">
           <div className="flex items-center justify-between">
             <div className="flex items-center">

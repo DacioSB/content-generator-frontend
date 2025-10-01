@@ -5,7 +5,6 @@ import { useLocation } from "react-router-dom";
 
 export function AuthPage() {
   const location = useLocation();
-  // Determine if we should show the sign-up form based on the URL path
   const isSignUp = location.pathname.startsWith("/sign-up");
 
   return (
@@ -15,8 +14,6 @@ export function AuthPage() {
           routing="path"
           path="/sign-up"
           signInUrl="/sign-in"
-          // After a successful sign-up, Clerk will redirect the user here.
-          // The backend user sync should be triggered on the dashboard or root layout.
           fallbackRedirectUrl="/dashboard" 
         />
       ) : (
@@ -24,7 +21,6 @@ export function AuthPage() {
           routing="path"
           path="/sign-in"
           signUpUrl="/sign-up"
-          // After a successful sign-in, Clerk will redirect the user here.
           fallbackRedirectUrl="/dashboard" 
         />
       )}
