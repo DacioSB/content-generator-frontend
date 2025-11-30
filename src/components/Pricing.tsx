@@ -1,4 +1,3 @@
-import React from 'react'
 import { Check } from 'lucide-react'
 import { Card, CardContent, CardFooter, CardHeader } from './ui/Card';
 import { Badge } from './ui/Badge'

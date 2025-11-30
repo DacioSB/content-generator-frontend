@@ -1,3 +1,21 @@
+
+export interface RecentContentResponse {
+  id: string;
+  title: string;
+  type: "text" | "image";
+  date: string;
+  status: "completed" | "in-progress" | "flagged";
+}
+
+// Add this function to the file
+export const getRecentContent = async (token?: string | null): Promise<RecentContentResponse[]> => {
+  if (!token) {
+    throw new Error("Token not available");
+  }
+  const response = await fetchAuthenticated("/content/recent", token);
+  return response.json();
+};
+
 const API_BASE_URL = "http://localhost:5002/api"; // Your ASP.NET Core backend URL
 
 interface ProjectResponse {
