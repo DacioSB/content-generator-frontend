@@ -96,11 +96,7 @@ export default function Dashboard() {
 
   const handleGenerateContent = () => {
 
-    // This would connect to your backend API for content generation
-
     console.log(`Generating ${selectedContentType} with prompt: ${prompt}`)
-
-    // In a real app, you would make an API call here
 
   }
 
