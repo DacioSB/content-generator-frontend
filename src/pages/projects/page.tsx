@@ -1,10 +1,10 @@
 "use client"
 
 import React, { useEffect, useState } from "react"
-import { FileText, Settings, Folder, LayoutDashboard, LogOut, PlusCircle} from "lucide-react"
-import { useClerk, useUser, useSession } from "@clerk/clerk-react";
+import { Folder, PlusCircle} from "lucide-react"
+import { useUser, useSession } from "@clerk/clerk-react";
 import { getProjects, createProject } from "../../api/client";
-import { useNavigate } from 'react-router-dom';
+import { Sidebar } from "../../components/Sidebar";
 
 // Recent project type
 interface Project {
@@ -15,10 +15,8 @@ interface Project {
 }
 
 export default function Projects() {
-  const { signOut } = useClerk();
   const {user} = useUser();
   const {session} = useSession();
-  const navigate = useNavigate();
   const [projects, setProjects] = useState<Project[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -57,71 +55,7 @@ export default function Projects() {
   
     return (
       <div className="flex h-screen bg-gray-50">
-      {/* Sidebar */}
-      <div className="hidden w-64 flex-shrink-0 bg-white border-r md:flex md:flex-col">
-        <div className="flex h-16 items-center justify-between border-b px-4">
-          <div className="flex items-center space-x-2">
-            <div className="h-8 w-8 rounded-full bg-teal-500 flex items-center justify-center">
-              <FileText className="h-4 w-4 text-white" />
-            </div>
-            <span className="text-lg font-semibold">ContentGen</span>
-          </div>
-        </div>
-        
-        <div className="flex flex-1 flex-col overflow-y-auto pt-5 pb-4">
-          <nav className="mt-5 flex-1 space-y-1 px-2">
-            <button
-              onClick={() => navigate('/dashboard')}
-              className="w-full flex items-center rounded-md px-2 py-2 text-sm font-medium text-gray-600 hover:bg-gray-100"
-            >
-              <LayoutDashboard className="mr-3 h-5 w-5" />
-              Dashboard
-            </button>
-            
-            <button
-              onClick={() => navigate('/my-content')}
-              className="w-full flex items-center rounded-md px-2 py-2 text-sm font-medium text-gray-600 hover:bg-gray-100"
-            >
-              <FileText className="mr-3 h-5 w-5" />
-              My Content
-            </button>
-            
-            <button
-              className="w-full flex items-center rounded-md px-2 py-2 text-sm font-medium text-teal-600 bg-teal-50"
-            >
-              <Folder className="mr-3 h-5 w-5" />
-              Projects
-            </button>
-            
-            <button
-              onClick={() => navigate('/settings')}
-              className="w-full flex items-center rounded-md px-2 py-2 text-sm font-medium text-gray-600 hover:bg-gray-100"
-            >
-              <Settings className="mr-3 h-5 w-5" />
-              Settings
-            </button>
-          </nav>
-        </div>
-        
-        <div className="border-t border-gray-200 p-4">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center">
-              <img 
-                src={user?.imageUrl} 
-                alt="User profile" 
-                className="h-8 w-8 rounded-full bg-gray-200" 
-              />
-              <span className="ml-3 text-sm font-medium text-gray-700">
-                {user?.fullName || "User"}
-              </span>
-            </div>
-            <LogOut 
-              className="h-5 w-5 text-gray-400 hover:text-gray-500 cursor-pointer" 
-              onClick={() => signOut()} 
-            />
-          </div>
-        </div>
-      </div>
+      <Sidebar />
   
         {/* Main content */}
         <div className="flex flex-1 flex-col overflow-y-auto">
@@ -130,7 +64,7 @@ export default function Projects() {
             <div className="flex h-16 items-center justify-between px-4">
               <div className="flex items-center space-x-2">
                 <div className="h-8 w-8 rounded-full bg-teal-500 flex items-center justify-center">
-                  <FileText className="h-4 w-4 text-white" />
+                  <Folder className="h-4 w-4 text-white" />
                 </div>
                 <span className="text-lg font-semibold">ContentGen</span>
               </div>
