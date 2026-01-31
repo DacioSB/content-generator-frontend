@@ -1,3 +1,4 @@
+const API_BASE_URL = "http://localhost:5002/api";
 
 export interface RecentContentResponse {
   id: string;
@@ -7,16 +8,19 @@ export interface RecentContentResponse {
   status: "completed" | "in-progress" | "flagged";
 }
 
-// Add this function to the file
-export const getRecentContent = async (token?: string | null): Promise<RecentContentResponse[]> => {
-  if (!token) {
-    throw new Error("Token not available");
-  }
-  const response = await fetchAuthenticated("/content/recent", token);
-  return response.json();
-};
+interface ProjectResponse {
+  id: string;
+  name: string;
+  isPublic: boolean;
+  createdAt: string;
+}
 
-const API_BASE_URL = "http://localhost:5002/api"; // Your ASP.NET Core backend URL
+export interface GenerateContentRequest {
+  prompt: string;
+  type: "text" | "image";
+  projectId?: string;
+}
+
 
 interface ProjectResponse {
   id: string;
@@ -78,3 +82,26 @@ export const createProject = async (name: string, isPublic: boolean, token?: str
   );
   return response.json();
 }
+
+// --- Content Generation API ---
+
+export const getRecentContent = async (token?: string | null): Promise<RecentContentResponse[]> => {
+  if (!token) {
+    throw new Error("Token not available");
+  }
+  const response = await fetchAuthenticated("/content/recent", token);
+  return response.json();
+};
+
+export const generateContent = async (body: GenerateContentRequest, token?: string | null): Promise<RecentContentResponse> => {
+  if (!token) throw new Error("Token not available");
+  const response = await fetchAuthenticated(
+    "/content/generate",
+    token,
+    {
+      method: "POST",
+      body: JSON.stringify(body),
+    }
+  );
+  return response.json();
+};
