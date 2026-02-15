@@ -1,13 +1,13 @@
 "use client"
 
-import { useState, useEffect } from "react"
+import { useState, useEffect, useCallback } from "react"
 import { Sidebar } from "../../components/Sidebar"
 
-import { FileText, ImageIcon, PlusCircle, Clock } from "lucide-react"
+import { FileText, ImageIcon, PlusCircle, Clock, Loader2 } from "lucide-react"
 
 import { useAuth, useUser } from "@clerk/clerk-react"; 
 
-import { getRecentContent, RecentContentResponse } from "../../api/client"; 
+import { generateContent, getRecentContent, RecentContentResponse } from "../../api/client"; 
 
 
 
@@ -29,74 +29,67 @@ export default function Dashboard() {
 
   const [errorContent, setErrorContent] = useState<string | null>(null);
 
-  const { getToken, userId, isSignedIn } = useAuth(); // Get getToken and userId from useAuth
+  const [isGenerating, setIsGenerating] = useState(false);
+  const [generationError, setGenerationError] = useState<string | null>(null);
+
+  const { getToken, isSignedIn } = useAuth(); // Get getToken and userId from useAuth
 
   const { user } = useUser(); // Get user object from useUser
 
-
+  
+  const fetchRecentContent = useCallback(async () => {
+    if (!isSignedIn) {
+      setLoadingContent(false)
+      return
+    }
+    const token = await getToken()
+    if (!token) {
+      setErrorContent("Authentication token not found.")
+      setLoadingContent(false)
+      return
+    }
+    try {
+      setLoadingContent(true)
+      const data = await getRecentContent(token)
+      setRecentContent(data)
+      setErrorContent(null)
+    } catch (err) {
+      console.error("Failed to fetch recent content:", err)
+      setErrorContent("Failed to load recent content.")
+    } finally {
+      setLoadingContent(false)
+    }
+  }, [isSignedIn, getToken]);
 
   useEffect(() => {
+    fetchRecentContent()
+  }, [fetchRecentContent]);
 
-    const fetchRecentContent = async () => {
 
-      if (!isSignedIn) { // Only fetch if signed in
 
-        setLoadingContent(false);
+  const handleGenerateContent = async () => {
 
-        return;
+    if (!selectedContentType || !prompt.trim()) return;
+    
+    setIsGenerating(true);
+    setGenerationError(null);
 
-      }
-
-      
-
+    try {
       const token = await getToken();
-
-      if (!token) {
-
-        setErrorContent("Authentication token not found.");
-
-        setLoadingContent(false);
-
-        return;
-
-      }
-
-      try {
-
-        setLoadingContent(true);
-
-        const data = await getRecentContent(token);
-
-        setRecentContent(data);
-
-      } catch (error) {
-
-        console.error("Failed to fetch recent content:", error);
-
-        setErrorContent("Failed to load recent content.");
-
-      } finally {
-
-        setLoadingContent(false);
-
-      }
-
-    };
-
-
-
-    fetchRecentContent();
-
-  }, [isSignedIn, getToken, userId]); // Depend on isSignedIn, getToken, and userId
-
-
-
-  const handleGenerateContent = () => {
-
-    console.log(`Generating ${selectedContentType} with prompt: ${prompt}`)
-
+      await generateContent(
+        {prompt: prompt.trim(), type: selectedContentType},
+        token
+      );
+      setPrompt("");
+      setSelectedContentType(null);
+      await fetchRecentContent();
+    } catch (error) {
+      console.error("Failed to generate content:", error);
+      setGenerationError("Failed to generate content. Please try again.");
+    } finally {
+      setIsGenerating(false);
+    }
   }
-
 
 
   return (
@@ -250,23 +243,40 @@ export default function Dashboard() {
 
                     onChange={(e) => setPrompt(e.target.value)}
 
+                    disabled={isGenerating}
                   />
 
                 </div>
+
+                {
+
+                  generationError && (
+
+                    <p className="text-sm text-red-500">{generationError}</p>
+                  )
+                }
 
                 <button
 
                   onClick={handleGenerateContent}
 
-                  disabled={!prompt.trim()}
+                  disabled={!prompt.trim() || isGenerating}
 
                   className="inline-flex items-center rounded-md bg-[#ff7757] px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-[#ff7757]/90 focus:outline-none focus:ring-2 focus:ring-[#ff7757] focus:ring-offset-2 disabled:opacity-50"
 
                 >
 
-                  <PlusCircle className="mr-2 h-4 w-4" />
-
-                  Generate {selectedContentType === "text" ? "Text" : "Image"}
+                  {isGenerating ? (
+                    <>
+                      <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                      Generating...
+                    </>
+                  ) : (
+                    <>
+                      <PlusCircle className="mr-2 h-4 w-4" />
+                      Generate {selectedContentType === "text" ? "Text" : "Image"}
+                    </>
+                  )}
 
                 </button>
 
@@ -330,11 +340,11 @@ export default function Dashboard() {
 
                           >
 
-                            <FileText
-
-                              className="h-5 w-5 text-blue-600"
-
-                            />
+                            {item.type === "text" ? (
+                              <FileText className="h-5 w-5 text-blue-600" />
+                            ) : (
+                              <ImageIcon className="h-5 w-5 text-purple-600" />
+                            )}
 
                           </div>
 
