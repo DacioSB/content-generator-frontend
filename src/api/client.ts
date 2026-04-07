@@ -22,11 +22,13 @@ export interface GenerateContentRequest {
 }
 
 
-interface ProjectResponse {
+export interface ProjectContentResponse {
   id: string;
-  name: string;
-  isPublic: boolean;
+  title: string;
+  type: "text" | "image";
+  status: "completed" | "in-progress" | "flagged";
   createdAt: string;
+  data: string;
 }
 
 async function fetchAuthenticated(url: string, token: string | null, options: RequestInit = {}): Promise<Response> {
@@ -65,6 +67,22 @@ export const getProjects = async (token?: string | null): Promise<ProjectRespons
     throw new Error("Token not available");
   }
   const response = await fetchAuthenticated("/projects", token);
+  return response.json();
+};
+
+export const getProject = async (projectId: string, token?: string | null): Promise<ProjectResponse> => {
+  if (!token) {
+    throw new Error("Token not available");
+  }
+  const response = await fetchAuthenticated(`/projects/${projectId}`, token);
+  return response.json();
+};
+
+export const getProjectContent = async (projectId: string, token?: string | null): Promise<ProjectContentResponse[]> => {
+  if (!token) {
+    throw new Error("Token not available");
+  }
+  const response = await fetchAuthenticated(`/projects/${projectId}/content`, token);
   return response.json();
 };
 
