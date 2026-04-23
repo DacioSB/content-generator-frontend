@@ -13,6 +13,7 @@ import { AuthPage } from './pages/AuthPage.tsx';
 import Dashboard from './pages/dashboard/page.tsx'; // Ensure this path is correct
 import { ProtectedRoute } from './components/ProtectedRoute.tsx';
 import Projects from './pages/projects/page.tsx';
+import ProjectDetail from './pages/projects/[id]/page.tsx';
 
 const PUBLISHABLE_KEY = import.meta.env.VITE_CLERK_PUBLISHABLE_KEY;
 
@@ -51,6 +52,14 @@ const router = createBrowserRouter([
         element: (
           <ProtectedRoute>
             <Projects />
+          </ProtectedRoute>
+        ),
+      },
+      {
+        path: "/projects/:id",
+        element: (
+          <ProtectedRoute>
+            <ProjectDetail />
           </ProtectedRoute>
         ),
       },
