@@ -6,6 +6,7 @@ export interface RecentContentResponse {
   type: "text" | "image";
   date: string;
   status: "completed" | "in-progress" | "flagged";
+  data: string;
 }
 
 interface ProjectResponse {

@@ -1,58 +1,57 @@
-
 "use client"
 
-import { useState, useEffect, useCallback } from "react";
-import { useParams } from "react-router-dom";
-import { Sidebar } from "../../../components/Sidebar";
-import { FileText, ImageIcon, PlusCircle, Clock, Loader2, ArrowLeft, X } from "lucide-react";
-import { useAuth } from "@clerk/clerk-react";
-import { getProject, getProjectContent, generateContent, ProjectContentResponse } from "../../../api/client";
-import { useNavigate } from "react-router-dom";
+import { useState, useEffect, useCallback } from "react"
+import { useParams } from "react-router-dom"
+import { Sidebar } from "../../../components/Sidebar"
+import { FileText, ImageIcon, PlusCircle, Clock, Loader2, ArrowLeft, X } from "lucide-react"
+import { useAuth } from "@clerk/clerk-react"
+import { getProject, getProjectContent, generateContent, ProjectContentResponse } from "../../../api/client"
+import { useNavigate } from "react-router-dom"
 
-type ContentType = "text" | "image" | null;
+type ContentType = "text" | "image" | null
 
 interface GeneratedContent {
-    id: string;
-    title: string;
-    type: "text" | "image";
-    data: string;
+  id: string
+  type: "text" | "image"
+  data: string
+  title: string
 }
 
 export default function ProjectDetail() {
-    const { id } = useParams<{id: string}>();
-    const navigate = useNavigate();
-    const { getToken } = useAuth();
+  const { id } = useParams<{ id: string }>()
+  const navigate = useNavigate()
+  const { getToken } = useAuth()
 
-    const [project, setProject] = useState<{id: string; name: string} | null>(null);
-    const [content, setContent] = useState<ProjectContentResponse[]>([]);
-    const [loadingContent, setLoadingContent] = useState(true);
-    const [loadingProject, setLoadingProject] = useState(true);
-    const [error, setError] = useState<string | null>(null)
+  const [project, setProject] = useState<{ id: string; name: string } | null>(null)
+  const [content, setContent] = useState<ProjectContentResponse[]>([])
+  const [loadingProject, setLoadingProject] = useState(true)
+  const [loadingContent, setLoadingContent] = useState(true)
+  const [error, setError] = useState<string | null>(null)
 
-    const [selectedContentType, setSelectedContentType] = useState<ContentType>(null);
-    const [prompt, setPrompt] = useState("");
-    const [isGenerating, setIsGenerating] = useState(false);
-    const [generationError, setGenerationError] = useState<string | null>(null);
-    const [generatedContent, setGeneratedContent] = useState<GeneratedContent | null>(null);
-    const [lastPrompt, setLastPrompt] = useState("");
-    const [lastType, setLastType] = useState<ContentType>(null);
+  const [selectedContentType, setSelectedContentType] = useState<ContentType>(null)
+  const [prompt, setPrompt] = useState("")
+  const [isGenerating, setIsGenerating] = useState(false)
+  const [generationError, setGenerationError] = useState<string | null>(null)
+  const [generatedContent, setGeneratedContent] = useState<GeneratedContent | null>(null)
+  const [lastPrompt, setLastPrompt] = useState("")
+  const [lastType, setLastType] = useState<ContentType>(null)
 
-    const fetchProject = useCallback(async () => {
-        if (!id) return;
-        try {
-            setLoadingProject(true);
-            const token = await getToken();
-            const project = await getProject(id, token);
-            setProject(project);
-        } catch (err) {
-            console.error("Failed to fetch project:", err);
-            setError(err instanceof Error ? err.message : "Failed to fetch project");
-        } finally {
-            setLoadingProject(false);
-        }
-    }, [id, getToken]);
+  const fetchProject = useCallback(async () => {
+    if (!id) return
+    try {
+      setLoadingProject(true)
+      const token = await getToken()
+      const projectData = await getProject(id, token)
+      setProject(projectData)
+    } catch (err) {
+      console.error("Failed to fetch project:", err)
+      setError("Failed to load project")
+    } finally {
+      setLoadingProject(false)
+    }
+  }, [id, getToken])
 
-    const fetchContent = useCallback(async () => {
+  const fetchContent = useCallback(async () => {
     if (!id) return
     try {
       setLoadingContent(true)
@@ -65,87 +64,89 @@ export default function ProjectDetail() {
     } finally {
       setLoadingContent(false)
     }
-  }, [id, getToken]);
+  }, [id, getToken])
 
-    useEffect(() => {
-        fetchProject();
-        fetchContent();
-    }, [fetchProject, fetchContent]);
+  useEffect(() => {
+    fetchProject()
+    fetchContent()
+  }, [fetchProject, fetchContent])
 
+  const handleGenerateContent = async () => {
+    if (!selectedContentType || !prompt.trim() || !id) return
 
-    const handleGenerateContent = async () => {
-        if (!selectedContentType || !prompt.trim() || !id) return;
+    setIsGenerating(true)
+    setGenerationError(null)
+    setGeneratedContent(null)
+    setLastPrompt(prompt)
+    setLastType(selectedContentType)
 
+    try {
+      const token = await getToken()
+      const result = await generateContent(
+        { prompt: prompt.trim(), type: selectedContentType, projectId: id },
+        token
+      )
 
-        setIsGenerating(true);
-        setGenerationError(null);
-        setGeneratedContent(null);
-        setLastPrompt(prompt);
-        setLastType(selectedContentType);
+      setGeneratedContent({
+        id: result.id,
+        type: result.type as "text" | "image",
+        data: result.data,
+        title: result.title
+      })
 
-        try {
-            const token = await getToken();
-            const result = await generateContent(
-                {prompt: prompt.trim(), type: selectedContentType, projectId: id},
-                token
-            );
-            setGeneratedContent({
-                id: result.id,
-                type: result.type as "text" | "image",
-                data: "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.",
-                title: result.title
-            });
-            setPrompt("");
-            setSelectedContentType(null);
-            await fetchContent();
-        } catch (error) {
-            console.error("Failed to generate content:", error);
-            setGenerationError("Failed to generate content. Please try again.");
-        }finally {
-            setIsGenerating(false);
-        }
+      setPrompt("")
+      setSelectedContentType(null)
+      await fetchContent()
+    } catch (err) {
+      console.error("Generation failed:", err)
+      setGenerationError("Failed to generate content. Please try again.")
+    } finally {
+      setIsGenerating(false)
     }
-    const handleRetry = () => {
-        setPrompt(lastPrompt)
-        setSelectedContentType(lastType)
-        setGenerationError(null)
-        handleGenerateContent()
-    }
-    const handleCloseGeneratedContent = () => {
-        setGeneratedContent(null)
-    }
+  }
 
-    if (loadingProject) {
-        return (
-        <div className="flex h-screen bg-gray-50">
-            <Sidebar />
-            <div className="flex flex-1 items-center justify-center">
-            <Loader2 className="h-8 w-8 animate-spin text-teal-600" />
-            </div>
-        </div>
-        );
-    }
+  const handleRetry = () => {
+    setPrompt(lastPrompt)
+    setSelectedContentType(lastType)
+    setGenerationError(null)
+    handleGenerateContent()
+  }
 
-    if (error || !project) {
-        return (
-        <div className="flex h-screen bg-gray-50">
-            <Sidebar />
-            <div className="flex flex-1 items-center justify-center">
-            <div className="text-center">
-                <p className="text-red-600">{error || "Project not found"}</p>
-                <button
-                onClick={() => navigate("/projects")}
-                className="mt-4 text-teal-600 hover:text-teal-700 underline"
-                >
-                Back to Projects
-                </button>
-            </div>
-            </div>
-        </div>
-        );
-    }
+  const handleCloseGeneratedContent = () => {
+    setGeneratedContent(null)
+  }
 
+  if (loadingProject) {
     return (
+      <div className="flex h-screen bg-gray-50">
+        <Sidebar />
+        <div className="flex flex-1 items-center justify-center">
+          <Loader2 className="h-8 w-8 animate-spin text-teal-600" />
+        </div>
+      </div>
+    )
+  }
+
+  if (error || !project) {
+    return (
+      <div className="flex h-screen bg-gray-50">
+        <Sidebar />
+        <div className="flex flex-1 items-center justify-center">
+          <div className="text-center">
+            <p className="text-red-600">{error || "Project not found"}</p>
+            <button
+              onClick={() => navigate("/projects")}
+              className="mt-4 text-teal-600 hover:text-teal-700 underline"
+            >
+              Back to Projects
+            </button>
+          </div>
+        </div>
+      </div>
+    )
+  }
+
+  return (
     <div className="flex h-screen bg-gray-50">
       <Sidebar />
 
@@ -194,12 +195,18 @@ export default function ProjectDetail() {
               <div className="mt-4 rounded-md bg-white p-4 border border-gray-200">
                 {generatedContent.type === "text" ? (
                   <p className="text-gray-800 whitespace-pre-wrap">{generatedContent.data}</p>
-                ) : (
+                ) : generatedContent.data ? (
                   <img
                     src={generatedContent.data}
                     alt={generatedContent.title}
-                    className="max-w-full h-auto rounded-md"
+                    className="w-full max-w-lg mx-auto block rounded-md"
+                    onError={(e) => {
+                      e.currentTarget.style.display = "none"
+                      e.currentTarget.nextElementSibling?.removeAttribute("hidden")
+                    }}
                   />
+                ) : (
+                  <p className="text-gray-500 text-sm">Image could not be displayed.</p>
                 )}
               </div>
             </div>
@@ -357,5 +364,5 @@ export default function ProjectDetail() {
         </main>
       </div>
     </div>
-  );
+  )
 }
